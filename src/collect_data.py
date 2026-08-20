@@ -9,7 +9,7 @@ headers = {
 }
 
 query = {
-    "size": 10,
+    "size": 1000,
     "_source": [
         "id",
         "numeroProcesso",
@@ -21,7 +21,9 @@ query = {
         "assuntos"
     ],
     "query": {
-        "match_all": {}
+        "term": {
+            "grau.keyword": "G1"
+        }
     }
 }
 
@@ -57,4 +59,11 @@ for hit in data["hits"]["hits"]:
 
 df = pd.DataFrame(rows)
 
-print(df.to_string(index=False))
+df.to_csv(
+    "data/trt5_processes_sample.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
+
+print(f"{len(df)} processes saved.")
+print(df.head())
