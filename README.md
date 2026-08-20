@@ -343,6 +343,6 @@ pick a labor court and explore its statistical subject profile.
 
 ---
 
-i'm not trying to predict court decisions with this project.
+## disclaimer!
 
-i just think there is a lot of useful information hidden in procedural metadata, and i wanted to see how much of it i could make easier to explore.
+i'm not trying to predict court decisions with this project! i just think there is a lot of useful information hidden in procedural metadata, and i wanted to see how much of it i could make easier to explore.
