@@ -2,7 +2,7 @@
 
 this project analyzes public labor court data from brazil to identify recurring legal subjects and patterns in labor litigation (obrigado pela ideia, clarinha!)
 
-the data is collected from the public datajud api, maintained by the conselho nacional de justiça (cnj), with an initial focus on first-degree cases from trt5, the labor court of bahia.
+the data is collected from the public datajud API, maintained by the conselho nacional de justiça (CNJ), with an initial focus on first-degree cases from TRT5, the labor court of bahia.
 
 the goal is to explore questions such as:
 
