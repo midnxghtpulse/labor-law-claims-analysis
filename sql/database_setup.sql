@@ -1,1 +1,21 @@
-
+create table labor_claims (
+    process_id varchar(100),
+    process_number varchar(30),
+    court varchar(20),
+    degree varchar(10),
+    filing_date varchar(20),
+    case_class text,
+    judging_body text,
+    municipality_code integer,
+    subjects text,
+    horas_extras integer,
+    dano_moral integer,
+    insalubridade integer,
+    periculosidade integer,
+    relacao_emprego integer,
+    rescisao_indireta integer,
+    verbas_rescisorias integer,
+    fgts integer,
+    aviso_previo integer,
+    intervalo_intrajornada integer
+);
