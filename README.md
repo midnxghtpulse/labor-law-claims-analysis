@@ -52,9 +52,12 @@ so far, i've:
 
 next up:
 
-* prepare the final views for power bi
-* build the dashboard
-* polish the final insights and documentation
+* create reusable sql views for power bi
+* connect power bi to postgresql
+* build the overview page
+* build the association explorer
+* build the court dna page
+* refine the final insights and documentation
 
 ---
 
@@ -197,7 +200,7 @@ another feature i'm building is what i've been calling **court dna**.
 
 the idea is to select a labor court and generate a statistical profile of the cases that appear there in the analyzed dataset.
 
-the profile currently has three parts:
+the profile currently has three parts.
 
 ### theme incidence
 
@@ -303,7 +306,7 @@ the processed dataset is then loaded into postgresql.
 the sql layer:
 
 1. validates the imported dataset
-2. reshapes the theme columns into a reusable long-format view
+2. reshapes the theme columns into a reusable format for analysis
 3. builds the association explorer
 4. calculates theme incidence by court
 5. compares each court with the trt5 baseline
@@ -385,7 +388,6 @@ creates the main `labor_claims` table used to store the processed dataset.
 
 contains the initial sql validation, exploratory queries and early versions of the association and court-level analyses.
 
-
 ### `association_explorer.sql`
 
 contains the reusable sql logic behind:
@@ -439,8 +441,4 @@ pick a labor court and explore:
 
 ## disclaimer!
 
-i'm not trying to predict court decisions with this project!
-
-i just think there is a lot of useful information hidden in procedural metadata, and i wanted to see how much of it i could make easier to explore.
-
-statistical incidence does not mean legal applicability, and differences between courts should not be interpreted as judicial bias, likelihood of success or legal advice.
+i'm not trying to predict court decisions with this project! i just think there is a lot of useful information hidden in procedural metadata, and i wanted to see how much of it i could make easier to explore. statistical incidence ≠ legal applicability, and differences between courts should not be interpreted as judicial bias, likelihood of success or legal advice.
