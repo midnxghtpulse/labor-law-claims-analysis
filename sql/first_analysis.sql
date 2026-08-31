@@ -155,3 +155,145 @@ select
 from court_profile c, trt5_average t
 
 order by difference_pp desc;
+
+-- court dna: most common theme combinations for a selected court [in this case, 1ª Vara do Trabalho de Vitória da Conquista]
+
+select
+    'fgts + aviso_previo' as combination,
+    count(*) as total_cases
+from labor_claims
+where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+  and fgts = 1
+  and aviso_previo = 1
+
+union all
+
+select
+    'horas_extras + fgts',
+    count(*)
+from labor_claims
+where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+  and horas_extras = 1
+  and fgts = 1
+
+union all
+
+select
+    'horas_extras + dano_moral',
+    count(*)
+from labor_claims
+where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+  and horas_extras = 1
+  and dano_moral = 1
+
+union all
+
+select
+    'dano_moral + fgts',
+    count(*)
+from labor_claims
+where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+  and dano_moral = 1
+  and fgts = 1
+
+union all
+
+select
+    'verbas_rescisorias + fgts',
+    count(*)
+from labor_claims
+where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+  and verbas_rescisorias = 1
+  and fgts = 1
+
+order by total_cases desc;
+
+-- court dna: automatically find the most common theme combinations [using the same judging body]
+
+with selected_themes as (
+
+    select process_id, 'horas_extras' as theme
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and horas_extras = 1
+
+    union all
+
+    select process_id, 'dano_moral'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and dano_moral = 1
+
+    union all
+
+    select process_id, 'insalubridade'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and insalubridade = 1
+
+    union all
+
+    select process_id, 'periculosidade'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and periculosidade = 1
+
+    union all
+
+    select process_id, 'relacao_emprego'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and relacao_emprego = 1
+
+    union all
+
+    select process_id, 'rescisao_indireta'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and rescisao_indireta = 1
+
+    union all
+
+    select process_id, 'verbas_rescisorias'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and verbas_rescisorias = 1
+
+    union all
+
+    select process_id, 'fgts'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and fgts = 1
+
+    union all
+
+    select process_id, 'aviso_previo'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and aviso_previo = 1
+
+    union all
+
+    select process_id, 'intervalo_intrajornada'
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+      and intervalo_intrajornada = 1
+)
+
+select
+    a.theme || ' + ' || b.theme as combination,
+    count(*) as total_cases
+
+from selected_themes a
+
+join selected_themes b
+    on a.process_id = b.process_id
+    and a.theme < b.theme
+
+group by
+    a.theme,
+    b.theme
+
+order by
+    total_cases desc;
