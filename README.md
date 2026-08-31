@@ -44,7 +44,7 @@ so far, i've:
 * calculated claim co-occurrence
 * calculated directional associations between themes
 * loaded the processed dataset into postgresql
-* created sql views to reshape the data for analysis
+* built reusable sql queries for association and court-level analysis
 * built a reusable association explorer in sql
 * created court-level theme profiles
 * compared individual courts with the trt5 baseline
@@ -335,8 +335,7 @@ images/
 sql/
 - database_setup.sql
 - first_analysis.sql
-- 02_views.sql
-- 03_association_explorer.sql
+- association_explorer.sql
 - court_dna.sql
 
 src/
@@ -386,11 +385,8 @@ creates the main `labor_claims` table used to store the processed dataset.
 
 contains the initial sql validation, exploratory queries and early versions of the association and court-level analyses.
 
-### `02_views.sql`
 
-creates `labor_claim_themes`, a long-format view that makes theme-based analysis much easier.
-
-### `03_association_explorer.sql`
+### `association_explorer.sql`
 
 contains the reusable sql logic behind:
 
@@ -432,7 +428,7 @@ pick a labor court and explore:
 
 ## next steps
 
-* create final sql views for power bi
+* create reusable sql views for power bi
 * connect power bi to postgresql
 * build the overview page
 * build the association explorer
