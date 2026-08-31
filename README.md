@@ -1,12 +1,16 @@
 # labor law claims analysis
 
-i wanted to build something with legal data - obrigado, clarinha - that was actually useful beyond just showing a few charts. so this project started with a pretty simple question:
+i wanted to build something with legal data - obrigado, clarinha - that was actually useful beyond just showing a few charts.
+
+so this project started with a pretty simple question:
 
 **if a labor claim contains x, what usually appears with it?**
 
-from there, the idea grew into a small legal analytics project using public labor court data from brazil. the data comes from the public datajud API, maintained by the conselho nacional de justiça (CNJ), and the current version focuses on first-degree cases from TRT5, the labor court of bahia.
+from there, the idea grew into a small legal analytics project using public labor court data from brazil.
 
-right now, i'm using the data to explore recurring labor-law subjects, combinations between claims and the statistical profile of different labor courts.
+the data comes from the public datajud api, maintained by the conselho nacional de justiça (cnj), and the current version focuses on first-degree cases from trt5, the labor court of bahia.
+
+right now, i'm using the data to explore recurring labor-law subjects, relationships between claims and the statistical profile of different labor courts.
 
 ---
 
@@ -17,8 +21,9 @@ instead of throwing random charts at the dataset, i started with questions i cou
 * which labor-law subjects appear the most?
 * if a case has a certain subject, what usually appears with it?
 * which claims tend to show up together?
-* does one labor court have a noticeably different subject profile from another?
-* how does a specific court compare with trt5 overall?
+* what does the statistical profile of a specific labor court look like?
+* which themes appear unusually often or unusually rarely in a court compared with trt5 overall?
+* which combinations of themes are especially common inside a specific court?
 
 basically, i'm trying to turn a giant pile of procedural metadata into something easier to explore.
 
@@ -26,7 +31,7 @@ basically, i'm trying to turn a giant pile of procedural metadata into something
 
 ## project status
 
-still building this one.
+still building this one, but the main analysis structure is already working.
 
 so far, i've:
 
@@ -38,13 +43,18 @@ so far, i've:
 * measured subject frequency
 * calculated claim co-occurrence
 * calculated directional associations between themes
+* loaded the processed dataset into postgresql
+* created sql views to reshape the data for analysis
+* built a reusable association explorer in sql
+* created court-level theme profiles
+* compared individual courts with the trt5 baseline
+* identified the most frequent theme combinations by court
 
 next up:
 
-* postgresql
-* sql analysis
-* court-level profiles
-* power bi
+* prepare the final views for power bi
+* build the dashboard
+* polish the final insights and documentation
 
 ---
 
@@ -56,9 +66,9 @@ next up:
 
 ## data source
 
-the project uses public procedural metadata from the datajud API, provided by the conselho nacional de justiça (CNJ).
+the project uses public procedural metadata from the datajud api, provided by the conselho nacional de justiça.
 
-the current development dataset contains 10,000 first-degree cases from TRT5.
+the current development dataset contains 10,000 first-degree cases from trt5.
 
 the full process-level datasets are generated locally instead of being stored in the repository.
 
@@ -129,6 +139,10 @@ in the current dataset:
 | notice pay | 29.63% |
 | severance payments | 25.83% |
 | intraday work interval | 20.59% |
+| unhealthy work conditions | 15.35% |
+| indirect termination | 12.98% |
+| recognition of employment relationship | 10.92% |
+| hazardous work conditions | 7.36% |
 
 so, for example:
 
@@ -181,38 +195,60 @@ because the percentage is calculated based on the starting theme.
 
 another feature i'm building is what i've been calling **court dna**.
 
-the idea is to select a labor court and generate a statistical profile of the cases handled there.
+the idea is to select a labor court and generate a statistical profile of the cases that appear there in the analyzed dataset.
 
-something like:
+the profile currently has three parts:
 
-```text
-1ª vara do trabalho de vitória da conquista
+### theme incidence
 
-main themes
+for each court, i calculate how often each selected theme appears.
 
-1. fgts
-2. overtime
-3. notice pay
-4. moral damages
+for example, in the current dataset:
 
-most common combinations
+`1ª vara do trabalho de vitória da conquista`
 
-1. fgts + notice pay
-2. overtime + fgts
-3. overtime + moral damages
-```
+| theme | court | trt5 | difference |
+|---|---:|---:|---:|
+| fgts | 54.17% | 29.35% | +24.82 p.p. |
+| notice pay | 34.17% | 22.98% | +11.19 p.p. |
+| intraday work interval | 9.17% | 8.02% | +1.15 p.p. |
+| moral damages | 15.00% | 16.03% | -1.03 p.p. |
+| severance payments | 14.17% | 18.41% | -4.24 p.p. |
+| overtime | 18.33% | 25.02% | -6.69 p.p. |
 
-and then compare that profile with trt5 overall.
+the `difference` column shows how many percentage points above or below the trt5 baseline that theme appears in the selected court.
 
-for example:
+### most common combinations
 
-```text
-overtime appears 4.2 percentage points above the trt5 average
+the analysis also automatically finds the most frequent pairs of themes inside each court.
 
-moral damages appear 1.8 percentage points below the trt5 average
-```
+for example, in the `1ª vara do trabalho de alagoinhas`:
 
-i think this is much more interesting than just ranking courts by raw case volume.
+| combination | cases | share of court cases |
+|---|---:|---:|
+| notice pay + fgts | 28 | 21.88% |
+| fgts + overtime | 23 | 17.97% |
+| fgts + severance payments | 20 | 15.63% |
+| notice pay + severance payments | 18 | 14.06% |
+| notice pay + overtime | 18 | 14.06% |
+
+the interesting part here is that different courts can show noticeably different subject mixes and combinations, even when the analysis stays entirely at the level of procedural metadata.
+
+### comparison with trt5
+
+instead of just ranking courts by raw case volume, the project compares each court with the overall trt5 baseline.
+
+that makes it easier to spot things like:
+
+`fgts appears 24.82 percentage points above the trt5 baseline`
+
+or:
+
+`overtime appears 6.69 percentage points below the trt5 baseline`
+
+for the selected court.
+
+i think this makes the court profile much more useful than a simple list of counts.
 
 ---
 
@@ -228,6 +264,7 @@ the tool is not meant to say things like:
 * this judge usually rules a certain way
 * this claim should be included
 * this case has a certain chance of winning
+* one court is "better" or "worse" for a specific party
 
 that would be way beyond what this data can responsibly support.
 
@@ -235,13 +272,21 @@ a better way to read the results is:
 
 **“these subjects frequently appear together in the analyzed procedural data.”**
 
+or, in the case of court dna:
+
+**“this theme appears more or less frequently in the analyzed cases from this court compared with the trt5 baseline.”**
+
 that's it.
 
 ---
 
 ## how the pipeline works
 
-the python side currently does this:
+the project currently has both a python layer and a sql layer.
+
+### python
+
+the python side:
 
 1. collects public process metadata from datajud
 2. extracts the fields i actually care about
@@ -250,6 +295,19 @@ the python side currently does this:
 5. counts subject frequency
 6. measures co-occurrence between themes
 7. calculates directional associations
+
+### postgresql + sql
+
+the processed dataset is then loaded into postgresql.
+
+the sql layer:
+
+1. validates the imported dataset
+2. reshapes the theme columns into a reusable long-format view
+3. builds the association explorer
+4. calculates theme incidence by court
+5. compares each court with the trt5 baseline
+6. automatically finds the most frequent theme combinations by court
 
 for example:
 
@@ -275,7 +333,11 @@ images/
 - README.md
 
 sql/
+- database_setup.sql
 - first_analysis.sql
+- 02_views.sql
+- 03_association_explorer.sql
+- court_dna.sql
 
 src/
 - analyze_associations.py
@@ -314,6 +376,37 @@ answers the question:
 
 ---
 
+## sql
+
+### `database_setup.sql`
+
+creates the main `labor_claims` table used to store the processed dataset.
+
+### `first_analysis.sql`
+
+contains the initial sql validation, exploratory queries and early versions of the association and court-level analyses.
+
+### `02_views.sql`
+
+creates `labor_claim_themes`, a long-format view that makes theme-based analysis much easier.
+
+### `03_association_explorer.sql`
+
+contains the reusable sql logic behind:
+
+**if i have x, what usually comes with it?**
+
+### `court_dna.sql`
+
+contains the court-level analysis, including:
+
+* theme incidence by court
+* comparison with the trt5 baseline
+* percentage-point differences
+* most common theme combinations by court
+
+---
+
 ## where this is going
 
 the final version should have three main views:
@@ -328,21 +421,30 @@ pick a theme and see what usually comes with it.
 
 ### court dna
 
-pick a labor court and explore its statistical subject profile.
+pick a labor court and explore:
+
+* its most frequent themes
+* how those themes compare with trt5 overall
+* the themes that stand out the most
+* its most frequent combinations of claims
 
 ---
 
 ## next steps
 
-* load the processed data into postgresql
-* write the main sql analyses
-* create court-level metrics
-* compare individual courts with trt5 overall
-* build the power bi dashboard
-* polish the final insights and documentation
+* create final sql views for power bi
+* connect power bi to postgresql
+* build the overview page
+* build the association explorer
+* build the court dna page
+* refine the final insights and documentation
 
 ---
 
 ## disclaimer!
 
-i'm not trying to predict court decisions with this project! i just think there is a lot of useful information hidden in procedural metadata, and i wanted to see how much of it i could make easier to explore.
+i'm not trying to predict court decisions with this project!
+
+i just think there is a lot of useful information hidden in procedural metadata, and i wanted to see how much of it i could make easier to explore.
+
+statistical incidence does not mean legal applicability, and differences between courts should not be interpreted as judicial bias, likelihood of success or legal advice.
