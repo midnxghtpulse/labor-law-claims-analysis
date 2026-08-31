@@ -1,4 +1,4 @@
--- basic data validation
+-- just some basic data validation
 
 select count(*)
 from labor_claims;
