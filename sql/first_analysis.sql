@@ -87,3 +87,71 @@ group by judging_body
 having count(*) >= 50
 
 order by total_cases desc;
+
+-- comparing with trt5 baseline to improve court dna
+
+with trt5_average as (
+    select
+        100.0 * sum(horas_extras) / count(*) as horas_extras,
+        100.0 * sum(dano_moral) / count(*) as dano_moral,
+        100.0 * sum(fgts) / count(*) as fgts,
+        100.0 * sum(aviso_previo) / count(*) as aviso_previo,
+        100.0 * sum(verbas_rescisorias) / count(*) as verbas_rescisorias
+    from labor_claims
+),
+
+court_profile as (
+    select
+        100.0 * sum(horas_extras) / count(*) as horas_extras,
+        100.0 * sum(dano_moral) / count(*) as dano_moral,
+        100.0 * sum(fgts) / count(*) as fgts,
+        100.0 * sum(aviso_previo) / count(*) as aviso_previo,
+        100.0 * sum(verbas_rescisorias) / count(*) as verbas_rescisorias
+    from labor_claims
+    where judging_body = '1ª Vara do Trabalho de Vitória da Conquista'
+)
+
+select
+    'horas_extras' as theme,
+    round(c.horas_extras, 2) as court_pct,
+    round(t.horas_extras, 2) as trt5_pct,
+    round(c.horas_extras - t.horas_extras, 2) as difference_pp
+from court_profile c, trt5_average t
+
+union all
+
+select
+    'dano_moral',
+    round(c.dano_moral, 2),
+    round(t.dano_moral, 2),
+    round(c.dano_moral - t.dano_moral, 2)
+from court_profile c, trt5_average t
+
+union all
+
+select
+    'fgts',
+    round(c.fgts, 2),
+    round(t.fgts, 2),
+    round(c.fgts - t.fgts, 2)
+from court_profile c, trt5_average t
+
+union all
+
+select
+    'aviso_previo',
+    round(c.aviso_previo, 2),
+    round(t.aviso_previo, 2),
+    round(c.aviso_previo - t.aviso_previo, 2)
+from court_profile c, trt5_average t
+
+union all
+
+select
+    'verbas_rescisorias',
+    round(c.verbas_rescisorias, 2),
+    round(t.verbas_rescisorias, 2),
+    round(c.verbas_rescisorias - t.verbas_rescisorias, 2)
+from court_profile c, trt5_average t
+
+order by difference_pp desc;
