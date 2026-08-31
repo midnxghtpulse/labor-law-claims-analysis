@@ -47,3 +47,6 @@ select
 
 from labor_claims
 where dano_moral = 1;
+
+-- court dna [selected theme incidence by judging body]
+
