@@ -43,13 +43,13 @@ a general look at the ten analytical themes and how often they appear in the dat
 
 pick a starting theme and explore what usually appears with it in the same cases.
 
-![association explorer](images/association_explorer.png)
+![association explorer](images/association explorer.png)
 
 ### court dna
 
 pick a labor court and explore its statistical subject profile, how it differs from the trt5 baseline and which combinations are most common there.
 
-![court dna](images/court_dna.png)
+![court dna](images/court dna.png)
 
 ---
 
